@@ -12,3 +12,13 @@ __pycache__
 .env.development.local
 .env.test.local
 .env.production.local
+
+# generated outputs / data / config, not tracked
+output/
+tags/
+papers/
+*.zip
+run_cfs*.yaml
+run_loss_survival*.yaml
+run.example.yaml
+tag_config.json
