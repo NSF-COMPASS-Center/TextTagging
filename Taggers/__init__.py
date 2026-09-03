@@ -1,3 +1,11 @@
+from .export import export_flat, flatten_records
+from .llm_tagger import (
+    TagDefinition,
+    create_tag_definitions,
+    run_llm_tagging,
+    tag_record_with_all_tiers,
+    tag_record_with_tier,
+)
 from .schema import (
     RunConfig,
     RunResult,
@@ -19,6 +27,11 @@ __all__ = [
     "tag_record",
     "tag_record_with_all",
     "run_string_match_tagging",
+    "TagDefinition",
+    "create_tag_definitions",
+    "tag_record_with_tier",
+    "tag_record_with_all_tiers",
+    "run_llm_tagging",
     "RunConfig",
     "RunResult",
     "TagMatch",
@@ -29,4 +42,6 @@ __all__ = [
     "from_dict",
     "save_run",
     "load_run",
+    "export_flat",
+    "flatten_records",
 ]

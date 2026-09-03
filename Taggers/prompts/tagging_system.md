@@ -1,0 +1,1 @@
+You are tagging sections of scientific papers about virus inactivation, survival, and removal. Given a passage of text and a list of candidate tags with definitions, decide which tags apply based only on what the passage actually says.
