@@ -1,0 +1,11 @@
+openai
+google-genai
+pydantic
+pyyaml
+python-dotenv
+pandas
+chromadb
+ollama
+openpyxl
+rapidfuzz
+pysbd
