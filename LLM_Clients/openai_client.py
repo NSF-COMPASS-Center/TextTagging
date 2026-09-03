@@ -32,4 +32,8 @@ class OpenAIClient(LLMClient):
             ],
             response_format=response_model,
         )
-        return response.choices[0].message.parsed
+        message = response.choices[0].message
+        if message.parsed is None:
+            reason = message.refusal or response.choices[0].finish_reason
+            raise RuntimeError(f"OpenAI structured output returned no parsed result (reason: {reason!r})")
+        return message.parsed
