@@ -1,0 +1,31 @@
+# Experiment: cfs paper type, 1-sentence chunking,
+# LLM tagging via local Ollama on the GPU box (gpt-oss:20b) -- run this there,
+# not on the laptop. If driving it remotely over an SSH tunnel, set
+# tagging_llm_host: http://localhost:11434 (see GPU_OLLAMA_SETUP.md).
+# Extraction: Chroma-backed semantic search restricted to chunks matching each
+# extraction param's tag AND excluding chunks under discarded markdown header
+# sections (semantic_tag_header_filtered). Fill in header_discard_phrases below.
+# Used by run_batch.py, which overrides `input` and `output_dir` per paper --
+# the values below are only used if this config is run directly via
+# `python runner.py --config ...`.
+input: path/to/cfs_paper.md
+paper_type: cfs
+
+tagger: llm
+tagging_llm_provider: ollama
+tagging_llm_model: gpt-oss:20b
+# tagging_llm_host: http://localhost:11434   # set if tunneling to the GPU box remotely
+sentences_per_chunk: 1
+output_dir: output/experiments/cfs/semantic_tag_header/llm/sent1
+
+extraction_type: semantic_tag_header_filtered   # semantic | semantic_tag_filtered | semantic_tag_header_filtered
+# Chunks whose markdown header breadcrumb contains any of these phrases
+# (case-insensitive substring match against every ancestor header) are
+# excluded from tagging and from extraction retrieval. Fill in as needed,
+# e.g. ["introduction", "references", "acknowledgments"].
+header_discard_phrases: []
+extraction_group_size: 4
+semantic_fallback_chunk_count: 5
+
+extraction_llm_provider: openai
+extraction_llm_model: gpt-4o

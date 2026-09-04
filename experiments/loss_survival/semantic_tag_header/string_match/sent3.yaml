@@ -1,0 +1,26 @@
+# Experiment: loss_survival paper type, 3-sentence chunking,
+# string-match tagging (phrase lookup, no LLM call) -- run this on your laptop.
+# Extraction: Chroma-backed semantic search restricted to chunks matching each
+# extraction param's tag AND excluding chunks under discarded markdown header
+# sections (semantic_tag_header_filtered). Fill in header_discard_phrases below.
+# Used by run_batch.py, which overrides `input` and `output_dir` per paper --
+# the values below are only used if this config is run directly via
+# `python runner.py --config ...`.
+input: path/to/loss_survival_paper.md
+paper_type: loss_survival
+
+tagger: string_match
+sentences_per_chunk: 3
+output_dir: output/experiments/loss_survival/semantic_tag_header/string_match/sent3
+
+extraction_type: semantic_tag_header_filtered   # semantic | semantic_tag_filtered | semantic_tag_header_filtered
+# Chunks whose markdown header breadcrumb contains any of these phrases
+# (case-insensitive substring match against every ancestor header) are
+# excluded from tagging and from extraction retrieval. Fill in as needed,
+# e.g. ["introduction", "references", "acknowledgments"].
+header_discard_phrases: []
+extraction_group_size: 4
+semantic_fallback_chunk_count: 5
+
+extraction_llm_provider: openai
+extraction_llm_model: gpt-4o

@@ -1,0 +1,25 @@
+# Experiment: loss_survival paper type, 5-sentence chunking,
+# LLM tagging via local Ollama on the GPU box (gpt-oss:20b) -- run this there,
+# not on the laptop. If driving it remotely over an SSH tunnel, set
+# tagging_llm_host: http://localhost:11434 (see GPU_OLLAMA_SETUP.md).
+# Extraction: Chroma-backed semantic search restricted to chunks matching each
+# extraction param's tag (semantic_tag_filtered) -- no markdown header filtering.
+# Used by run_batch.py, which overrides `input` and `output_dir` per paper --
+# the values below are only used if this config is run directly via
+# `python runner.py --config ...`.
+input: path/to/loss_survival_paper.md
+paper_type: loss_survival
+
+tagger: llm
+tagging_llm_provider: ollama
+tagging_llm_model: gpt-oss:20b
+# tagging_llm_host: http://localhost:11434   # set if tunneling to the GPU box remotely
+sentences_per_chunk: 5
+output_dir: output/experiments/loss_survival/semantic_tag/llm/sent5
+
+extraction_type: semantic_tag_filtered   # semantic | semantic_tag_filtered | semantic_tag_header_filtered
+extraction_group_size: 4
+semantic_fallback_chunk_count: 5
+
+extraction_llm_provider: openai
+extraction_llm_model: gpt-4o

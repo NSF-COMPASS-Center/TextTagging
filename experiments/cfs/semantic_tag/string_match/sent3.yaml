@@ -1,0 +1,20 @@
+# Experiment: cfs paper type, 3-sentence chunking,
+# string-match tagging (phrase lookup, no LLM call) -- run this on your laptop.
+# Extraction: Chroma-backed semantic search restricted to chunks matching each
+# extraction param's tag (semantic_tag_filtered) -- no markdown header filtering.
+# Used by run_batch.py, which overrides `input` and `output_dir` per paper --
+# the values below are only used if this config is run directly via
+# `python runner.py --config ...`.
+input: path/to/cfs_paper.md
+paper_type: cfs
+
+tagger: string_match
+sentences_per_chunk: 3
+output_dir: output/experiments/cfs/semantic_tag/string_match/sent3
+
+extraction_type: semantic_tag_filtered   # semantic | semantic_tag_filtered | semantic_tag_header_filtered
+extraction_group_size: 4
+semantic_fallback_chunk_count: 5
+
+extraction_llm_provider: openai
+extraction_llm_model: gpt-4o
