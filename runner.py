@@ -1,9 +1,17 @@
 """Runner: markdown file -> chunks -> tag(s) -> saved RunResult(s) + flat export
--> optional extraction (tag-based and/or semantic-search baseline).
+-> optional Chroma-backed semantic extraction.
 
-Tagging is configurable via CLI or config. Extraction (which pipeline(s) to run,
-params/queries paths, extraction LLM provider/model, batching, etc.) is config-only --
-set it in the YAML config passed via --config.
+Tagging is configurable via CLI or config. Extraction (extraction_type,
+params/queries paths, extraction LLM provider/model, etc.) is config-only --
+set it in the YAML config passed via --config. Tag and header metadata always
+get attached to the persistent per-document Chroma collection; extraction_type
+picks whether/how they filter retrieval:
+  semantic                      - plain semantic search, no filtering
+  semantic_tag_filtered         - restrict to chunks tagged with the param's
+                                   name (falls back to unfiltered search for a
+                                   param with no matching tag in the document)
+  semantic_tag_header_filtered  - tag filter (same fallback) plus excluding
+                                   chunks under a header_discard_phrases section
 
 Usage:
     python runner.py --config run.yaml
@@ -14,13 +22,19 @@ Usage:
 import argparse
 import copy
 import os
-from typing import Any, Dict, List, Optional
+import re
+from typing import Any, Dict, List
 
 import yaml
 from dotenv import load_dotenv
 
-from Document_Parsing import Chunk, parse_markdown
-from Extraction import ExtractionStore, run_extraction_on_tags, run_semantic_baseline
+from Document_Parsing import Chunk, filter_chunks_by_header_phrases, parse_markdown
+from Extraction import (
+    ExtractionStore,
+    build_tag_lookup,
+    get_or_rebuild_collection,
+    run_semantic_pipeline,
+)
 from LLM_Clients import GeminiClient, LLMClient, OllamaClient, OpenAIClient
 from Taggers import (
     RunResult,
@@ -35,8 +49,7 @@ from Taggers import (
 )
 
 _TAGGER_CHOICES = ("string_match", "llm", "both")
-_EXTRACT_CHOICES = ("tags", "semantic", "both")
-_EXTRACTION_MODE_CHOICES = ("grouped", "by_tag")
+_EXTRACTION_TYPE_CHOICES = ("semantic", "semantic_tag_filtered", "semantic_tag_header_filtered")
 _PROVIDER_CLIENTS = {"openai": OpenAIClient, "gemini": GeminiClient, "ollama": OllamaClient}
 
 _PAPER_TYPE_CHOICES = ("loss_survival", "uv", "cfs")
@@ -79,10 +92,9 @@ def load_config(path: str) -> Dict[str, Any]:
 def build_settings(args: argparse.Namespace) -> Dict[str, Any]:
     settings: Dict[str, Any] = {
         "output_dir": "output",
-        "extraction_mode": "grouped",
-        "extraction_max_chunks_per_tag": 20,
         "extraction_group_size": 4,
-        "semantic_top_k": 5,
+        "semantic_fallback_chunk_count": 5,
+        "header_discard_phrases": [],
     }
 
     if args.config:
@@ -111,21 +123,18 @@ def build_settings(args: argparse.Namespace) -> Dict[str, Any]:
     if not settings.get("tagger"):
         raise ValueError("No tagger method given (use --tagger or config.tagger)")
 
-    extract = settings.get("extract")
-    if extract:
-        if extract not in _EXTRACT_CHOICES:
-            raise ValueError(f"Unknown config.extract {extract!r}; expected one of {_EXTRACT_CHOICES}")
+    extraction_type = settings.get("extraction_type")
+    if extraction_type:
+        if extraction_type not in _EXTRACTION_TYPE_CHOICES:
+            raise ValueError(f"Unknown config.extraction_type {extraction_type!r}; expected one of {_EXTRACTION_TYPE_CHOICES}")
         if not settings.get("extraction_params"):
-            raise ValueError("config.extract requires config.extraction_params")
-        extraction_mode = settings.get("extraction_mode")
-        if extraction_mode not in _EXTRACTION_MODE_CHOICES:
-            raise ValueError(f"Unknown config.extraction_mode {extraction_mode!r}; expected one of {_EXTRACTION_MODE_CHOICES}")
+            raise ValueError("config.extraction_type requires config.extraction_params")
 
     return settings
 
 
 def chunks_to_records(chunks: List[Chunk]) -> List[TaggedRecord]:
-    return [make_record(text=c.text, id=str(i), metadata=c.metadata) for i, c in enumerate(chunks)]
+    return [make_record(text=c.text, id=c.id, metadata=c.metadata) for c in chunks]
 
 
 _LLM_DEFAULTS = {
@@ -194,31 +203,68 @@ def run_llm(settings: Dict[str, Any], chunks: List[Chunk]) -> RunResult:
     return run_llm_tagging(tag_defs, records, client, config, output_dir=settings["output_dir"])
 
 
-def run_tag_extraction(settings: Dict[str, Any], result: RunResult, client: LLMClient) -> ExtractionStore:
-    output_path = os.path.join(settings["output_dir"], f"{result.config.run_id}_extraction.json")
-    return run_extraction_on_tags(
-        result,
-        settings["extraction_params"],
-        client,
-        mode=settings["extraction_mode"],
-        max_chunks_per_tag=settings["extraction_max_chunks_per_tag"],
-        group_size=settings["extraction_group_size"],
-        max_calls=settings.get("extraction_max_calls"),
-        output_path=output_path,
-    )
+def parse_full_chunks(settings: Dict[str, Any]) -> List[Chunk]:
+    """The full, unfiltered document corpus (stable chunk ids, no header-phrase
+    filtering) -- this is what gets indexed into Chroma. Tagging runs against a
+    header-filtered subset of this same list (see run_tagging)."""
+    with open(settings["input"], "r") as f:
+        text = f.read()
+    return parse_markdown(text, max_chunk_size=settings.get("max_chunk_size"), sentences_per_chunk=settings.get("sentences_per_chunk"))
 
 
-def run_semantic_extraction(settings: Dict[str, Any], client: LLMClient) -> ExtractionStore:
-    output_path = os.path.join(settings["output_dir"], "semantic_baseline_extraction.json")
-    return run_semantic_baseline(
-        settings["input"],
+def run_tagging(settings: Dict[str, Any], full_chunks: List[Chunk]) -> List[RunResult]:
+    tagging_chunks = filter_chunks_by_header_phrases(full_chunks, settings.get("header_discard_phrases"))
+    tagger = settings["tagger"]
+
+    results: List[RunResult] = []
+    if tagger in ("string_match", "both"):
+        results.append(run_string_match(settings, copy.deepcopy(tagging_chunks)))
+    if tagger in ("llm", "both"):
+        results.append(run_llm(settings, copy.deepcopy(tagging_chunks)))
+
+    return results
+
+
+def merged_tag_lookup(results: List[RunResult]) -> Dict[str, List[str]]:
+    """Union tag names per chunk id across every tagger run (relevant when
+    tagger: both produced two RunResults over the same tagging_chunks)."""
+    merged: Dict[str, List[str]] = {}
+    for result in results:
+        for chunk_id, tag_names in build_tag_lookup(result).items():
+            existing = merged.setdefault(chunk_id, [])
+            for name in tag_names:
+                if name not in existing:
+                    existing.append(name)
+
+    return merged
+
+
+def chroma_collection_name(input_path: str) -> str:
+    stem = os.path.splitext(os.path.basename(input_path))[0]
+    return re.sub(r"[^a-zA-Z0-9_-]", "_", stem)
+
+
+def build_document_collection(settings: Dict[str, Any], full_chunks: List[Chunk], tag_results: List[RunResult]) -> "chromadb.Collection":
+    tag_lookup = merged_tag_lookup(tag_results)
+    persist_path = os.path.join(settings["output_dir"], "chroma_db")
+    collection_name = chroma_collection_name(settings["input"])
+    return get_or_rebuild_collection(persist_path, collection_name, full_chunks, tag_lookup, settings.get("header_discard_phrases"))
+
+
+def run_extraction(settings: Dict[str, Any], collection: "chromadb.Collection", client: LLMClient) -> ExtractionStore:
+    extraction_type = settings["extraction_type"]
+    output_path = os.path.join(settings["output_dir"], f"{extraction_type}_extraction.json")
+
+    return run_semantic_pipeline(
+        collection,
         settings["extraction_params"],
         settings.get("semantic_queries"),
         client,
-        top_k=settings["semantic_top_k"],
-        max_chunk_size=settings.get("max_chunk_size"),
-        sentences_per_chunk=settings.get("sentences_per_chunk"),
         group_size=settings["extraction_group_size"],
+        sentences_per_chunk=settings.get("sentences_per_chunk"),
+        tag_filter=extraction_type in ("semantic_tag_filtered", "semantic_tag_header_filtered"),
+        header_filter=extraction_type == "semantic_tag_header_filtered",
+        fallback_chunk_count=settings["semantic_fallback_chunk_count"],
         output_path=output_path,
     )
 
@@ -228,21 +274,10 @@ def main() -> None:
     args = parse_args()
     settings = build_settings(args)
 
-    with open(settings["input"], "r") as f:
-        text = f.read()
-    chunks = parse_markdown(
-        text, max_chunk_size=settings.get("max_chunk_size"), sentences_per_chunk=settings.get("sentences_per_chunk"),
-    )
+    full_chunks = parse_full_chunks(settings)
+    print(f"Parsed {len(full_chunks)} chunk(s) from {settings['input']}")
 
-    tagger = settings["tagger"]
-    results: List[RunResult] = []
-
-    if tagger in ("string_match", "both"):
-        results.append(run_string_match(settings, copy.deepcopy(chunks)))
-    if tagger in ("llm", "both"):
-        results.append(run_llm(settings, copy.deepcopy(chunks)))
-
-    print(f"Parsed {len(chunks)} chunk(s) from {settings['input']}")
+    results = run_tagging(settings, full_chunks)
     for result in results:
         match_count = sum(len(record.matches) for record in result.records)
         flat_path = export_flat(result, settings["output_dir"])
@@ -252,22 +287,13 @@ def main() -> None:
             f"-> {settings['output_dir']}/{result.config.run_id}.json, {flat_path}"
         )
 
-    extract = settings.get("extract")
-    if extract:
-        client: Optional[LLMClient] = None
-
-        if extract in ("tags", "both"):
-            client = client or build_llm_client(settings, "extraction")
-            for result in results:
-                store = run_tag_extraction(settings, result, client)
-                total = sum(len(v) for v in store.values())
-                print(f"[extraction:tags:{result.config.tagger_method}] {total} unique value(s) extracted")
-
-        if extract in ("semantic", "both"):
-            client = client or build_llm_client(settings, "extraction")
-            store = run_semantic_extraction(settings, client)
-            total = sum(len(v) for v in store.values())
-            print(f"[extraction:semantic] {total} unique value(s) extracted")
+    extraction_type = settings.get("extraction_type")
+    if extraction_type:
+        client = build_llm_client(settings, "extraction")
+        collection = build_document_collection(settings, full_chunks, results)
+        store = run_extraction(settings, collection, client)
+        total = sum(len(v) for v in store.values())
+        print(f"[extraction:{extraction_type}] {total} unique value(s) extracted")
 
 
 if __name__ == "__main__":

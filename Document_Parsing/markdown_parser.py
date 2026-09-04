@@ -58,8 +58,10 @@ def parse_markdown(
     chunks: List[Chunk] = []
     buffer: List[str] = []
     in_fence = False
+    chunk_index = 0
 
     def finalize() -> None:
+        nonlocal chunk_index
         body = "\n".join(buffer).strip()
         buffer.clear()
 
@@ -68,7 +70,8 @@ def parse_markdown(
 
         section_titles = [title for title in breadcrumb if title is not None]
         for piece in _split_body(body, max_chunk_size, sentences_per_chunk):
-            chunks.append(Chunk(text=piece, metadata={"section_titles": list(section_titles)}))
+            chunks.append(Chunk(text=piece, metadata={"section_titles": list(section_titles)}, id=f"c{chunk_index}"))
+            chunk_index += 1
 
     for line in text.splitlines():
         if _FENCE_RE.match(line):

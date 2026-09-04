@@ -1,8 +1,9 @@
 """Batch runner: for one paper type, run tagging (string_match or llm --
 whichever the config's `tagger` says; `tagger: both` isn't supported here,
-use runner.py directly for that) + tag analysis + tag-based/semantic
-extraction over a list of input markdown papers, then (optionally) evaluate
-the extraction output against hand-labeled ground truth.
+use runner.py directly for that) + tag analysis + Chroma-backed semantic
+extraction (per config.extraction_type) over a list of input markdown papers,
+then (optionally) evaluate the extraction output against hand-labeled ground
+truth.
 
 Each input's output lands in <output_dir>/<pdf_name>/ (pdf_name = the input
 filename's stem), matching the directory convention Evaluation/eval.py expects.
@@ -86,28 +87,9 @@ def run_one(
             f"got tagger: {tagger!r} in {config} -- tagger: both isn't supported here (use runner.py directly)"
         )
 
-    extract = settings.get("extract")
-    client = None
-    semantic_store = None
-    tag_store = None
-
-    # Semantic runs first: it re-parses the markdown independently and doesn't
-    # depend on tagging at all, so it's run before string-match tagging/analysis.
-    if extract in ("semantic", "both"):
-        client = client or runner.build_llm_client(settings, "extraction")
-        semantic_store = runner.run_semantic_extraction(settings, client)
-        print(f"[{pdf_name}] extraction:semantic {sum(len(v) for v in semantic_store.values())} unique value(s)")
-
-    with open(settings["input"], "r") as f:
-        text = f.read()
-    chunks = runner.parse_markdown(
-        text, max_chunk_size=settings.get("max_chunk_size"), sentences_per_chunk=settings.get("sentences_per_chunk"),
-    )
-
-    if tagger == "string_match":
-        result = runner.run_string_match(settings, chunks)
-    else:
-        result = runner.run_llm(settings, chunks)
+    full_chunks = runner.parse_full_chunks(settings)
+    results = runner.run_tagging(settings, full_chunks)
+    result = results[0]
 
     flat_path = runner.export_flat(result, settings["output_dir"])
     match_count = sum(len(record.matches) for record in result.records)
@@ -119,20 +101,25 @@ def run_one(
         f.write(report_text)
     print(f"[{pdf_name}] tag analysis -> {report_path}")
 
-    if extract in ("tags", "both"):
-        client = client or runner.build_llm_client(settings, "extraction")
-        tag_store = runner.run_tag_extraction(settings, result, client)
-        print(f"[{pdf_name}] extraction:tags {sum(len(v) for v in tag_store.values())} unique value(s)")
+    extraction_type = settings.get("extraction_type")
+    store = None
+    if extraction_type:
+        client = runner.build_llm_client(settings, "extraction")
+        collection = runner.build_document_collection(settings, full_chunks, results)
+        store = runner.run_extraction(settings, collection, client)
+        print(f"[{pdf_name}] extraction:{extraction_type} {sum(len(v) for v in store.values())} unique value(s)")
 
-    # Side-by-side comparison of the two extraction methods, independent of
-    # eval.py/ground truth -- always written when both ran, so there's a
-    # manual sanity check even if evaluation has no ground truth or fails.
-    if tag_store is not None and semantic_store is not None:
+    # Side-by-side comparison against ground truth, independent of eval.py --
+    # always written when extraction ran, so there's a manual sanity check
+    # even if evaluation has no ground truth or fails.
+    if store is not None:
         params = create_param_definitions(settings["extraction_params"])
         gt_fields = (ground_truth or {}).get(normalize_pdf_name(pdf_name), {})
-        rows = build_comparison_rows(tag_store, semantic_store, params, ground_truth_fields=gt_fields)
-        csv_path = write_comparison_csv(rows, os.path.join(output_dir, f"{pdf_name}_comparison.csv"))
-        html_path = write_comparison_html(rows, os.path.join(output_dir, f"{pdf_name}_comparison.html"), title=pdf_name)
+        rows = build_comparison_rows({extraction_type: store}, params, ground_truth_fields=gt_fields)
+        csv_path = write_comparison_csv(rows, os.path.join(output_dir, f"{pdf_name}_comparison.csv"), store_names=[extraction_type])
+        html_path = write_comparison_html(
+            rows, os.path.join(output_dir, f"{pdf_name}_comparison.html"), title=pdf_name, store_names=[extraction_type]
+        )
         print(f"[{pdf_name}] comparison -> {csv_path}, {html_path}")
 
 
@@ -155,8 +142,8 @@ def main() -> None:
     output_dir = args.output_dir or config_data.get("output_dir", "output")
 
     # Loaded once up front (not just in run_evaluation) so per-paper comparison
-    # files can show ground truth alongside tag-based/semantic values even if
-    # the evaluation step at the end fails or --eval-report isn't wanted.
+    # files can show ground truth alongside extracted values even if the
+    # evaluation step at the end fails or --eval-report isn't wanted.
     ground_truth = load_ground_truth(args.ground_truth) if args.ground_truth else None
 
     failed = []
@@ -180,7 +167,7 @@ def main() -> None:
             print(f"\n[eval] evaluation FAILED: {e}")
             print(
                 f"[eval] this does not affect the extraction outputs already saved under "
-                f"{output_dir}/<pdf_name>/*_extraction.json and semantic_baseline_extraction.json -- "
+                f"{output_dir}/<pdf_name>/<extraction_type>_extraction.json -- "
                 f"see each paper's <pdf_name>_comparison.csv/html for a manual side-by-side check instead."
             )
 
