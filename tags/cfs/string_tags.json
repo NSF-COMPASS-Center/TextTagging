@@ -1,0 +1,93 @@
+{
+  "virus": [
+        "virus", "viral", "phage", "VLP", "virus-like particle",
+        "cell line", "ATCC", "host cells",
+        "propagated in", "titrated in"
+      ],
+      "ph_before_treatment": [
+        "pH was adjusted", "pH adjustment", "final pH",
+        "target pH", "pH was approximately"
+      ],
+      "ph_after_treatment": [
+        "pH was adjusted", "pH adjustment", "final pH",
+        "target pH", "pH was approximately"
+      ],
+      "coagulant": [
+        "coagulant", "alum", "ferric chloride", "ferric sulfate",
+        "PACl", "polyaluminum chloride", "aluminum sulfate",
+        "FeCl", "coagulation"
+      ],
+      "coagulant_dose": [
+        "dose", "dosage", "mg/L", "mg Fe/L", "mg-Al/L",
+        "doses ranging from", "coagulant doses"
+      ],
+      "source_water": [
+        "raw water", "source water", "surface water",
+        "wastewater", "tap water", "synthetic",
+        "river water", "lake water", "groundwater",
+        "DWTP", "drinking water treatment plant",
+        "spent filter backwash", "SFBW"
+      ],
+      "rapid_mix_time": [
+        "rapid mix", "rapid mixing", "mixed at",
+        "rpm", "stirred rapidly", "shaken",
+        "velocity gradient",
+        "flocculation", "slowly mixed", "tapered"
+      ],
+      "rapid_mix_speed": [
+        "rpm", "stirred rapidly", "shaken",
+        "velocity gradient",
+        "flocculation", "slowly mixed", "tapered"
+      ],
+      "sedimentation_time": [
+        "allowed to stand", "left at rest", "settle", "settling",
+        "sedimentation", "hydraulic residence time"
+      ],
+      "virus_measurement_methods": [
+        "plaque assay", "PFU", "TCID50", "RT-PCR",
+        "qPCR", "RT-qPCR", "PCR", "ELISA",
+        "double agar layer", "DAL",
+        "viral RNA extracted", "serially diluted",
+        "detection limit"
+      ],
+      "spiked_concentration": [
+        "spiked", "seeded", "initial concentration",
+        "stock solution", "PFU/mL", "TCID50/mL",
+        "genome copies/mL", "VLPs/mL"
+      ],
+      "water_quality": [
+        "turbidity", "NTU", "TOC", "total organic carbon",
+        "UV254", "UVA254", "absorbance at 254",
+        "UV260", "alkalinity", "CaCO3",
+        "total suspended solids", "TSS", "DOC"
+      ],
+        "additives": [
+        "clay", "kaolin", "bentonite",
+        "sand", "silica", "SiO2",
+        "sodium hydrogen carbonate", "buffer",
+        "MgCl2", "polymer", "polyacrylamide",
+        "polyDADMAC", "coagulant aid"
+      ],
+      "treatment_scale": [
+        "bench-scale", "jar-test", "jar test",
+        "pilot plant", "pilot-scale",
+        "full-scale", "DWTP sampling",
+        "laboratory experiment"
+      ],
+      "filtration": [
+        "rapid sand filter", "RSF", "membrane",
+        "ultrafiltration", "microfiltration",
+        "sand filtration", "granular media",
+        "dual media", "anthracite"
+      ],
+      "sampling_protocol": [
+        "triplicate", "duplicate", "n =",
+        "sampling point", "collected weekly",
+        "sampling date", "replicate"
+      ],
+      "uv260_final": [
+        "post-treatment UV260",
+        "after coagulation UV260",
+        "treated water UV260"
+      ]
+    }

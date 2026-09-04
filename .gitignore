@@ -15,7 +15,6 @@ __pycache__
 
 # generated outputs / data / config, not tracked
 output/
-tags/
 *.zip
 run_cfs*.yaml
 run_loss_survival*.yaml

@@ -1,0 +1,261 @@
+{
+"virus": [
+        "propagated in",
+        "titrated in",
+        "obtained from ATCC",
+        "ATCC",
+        "cell line",
+        "host",
+        "host cells",
+        "provided courtesy of",
+        "purified by ultracentrifugation"
+      ],
+      "ph_before_treatment": [
+        "pH was adjusted",
+        "pH adjustment",
+        "bring the final pH to",
+        "target pH",
+        "pH was approximately",
+        "after enough HCl",
+        "after enough NaOH",
+        "after enough HCl or NaOH was added",
+        "H2SO4 while mixing",
+        "pH fell after coagulation"
+      ],
+      "ph_after_treatment": [
+        "pH was adjusted",
+        "pH adjustment",
+        "bring the final pH to",
+        "target pH",
+        "pH was approximately",
+        "after enough HCl",
+        "after enough NaOH",
+        "after enough HCl or NaOH was added",
+        "H2SO4 while mixing",
+        "pH fell after coagulation"
+      ],
+      "coagulant": [
+        "coagulant was injected",
+        "commercial coagulant",
+        "high-basicity",
+        "basicity (%)"
+      ],
+      "source_water": [
+        "raw water (RW)",
+        "source water was sampled",
+        "collected monthly",
+        "collected weekly",
+        "surface lake water",
+        "pasteurized sewage amended",
+        "DWTP",
+        "Plant B",
+        "stored at 4\u00b0C",
+        "transported in cooler with ice packs"
+      ],
+      "coagulant_dose": [
+        "dose",
+        "dose of",
+        "coagulant doses",
+        "dosages were the same as",
+        "doses ranging from",
+        "mg/L",
+        "mg Fe/L",
+        "mg-Al/L"
+      ],
+      "coagulant_aid_dose": [
+        "dose",
+        "dose of"
+      ],
+      "temp": [
+        "equilibrating to room temperature",
+        "room temperature",
+        "\u00b0C"
+      ],
+      "rapid_mix_time": [
+        "mixed at",
+        "rpm",
+        "for 1 min",
+        "stirred rapidly",
+        "rapid mixing",
+        "shaken",
+        "inline"
+      ],
+      "rapid_mix_speed": [
+        "mixed at",
+        "rpm",
+        "for 1 min",
+        "stirred rapidly",
+        "rapid mixing",
+        "shaken",
+        "inline"
+      ],
+      "flocculation_time": [
+        "then slowly",
+        "slowly mixed",
+        "for 10 min",
+        "chambers"
+      ],
+      "sedimentation_time": [
+        "allowed to stand",
+        "left at rest",
+        "no mixing for",
+        "settle",
+        "settling",
+        "hydraulic residence time",
+        "sedimentation basin"
+      ],
+      "virus_measurement_methods": [
+        "plaque assay",
+        "PFU",
+        "TCID50",
+        "RT-PCR",
+        "viral RNA extracted",
+        "double agar layer (DAL) method",
+        "serially diluted",
+        "viral titration",
+        "titrated"
+      ],
+      "spiked_concentration": [
+        "initial concentration (C0)",
+        "spiked",
+        "seeded",
+        "stock solution",
+        "PFU/mL",
+        "TCID50/mL",
+        "VLPs/mL"
+      ],
+      "clay_addition": [
+        "clay was added"
+      ],
+      "sand_addition": [
+        "sand was added"
+      ],
+      "alkalinity_addition": [
+        "sodium hydrogen carbonate",
+        "buffer",
+        "carbonate",
+        "alkalinity (as CaCO3)",
+        "acid neutralization"
+      ],
+      "salt_addition": [
+        "MgCl2 added",
+        "ionic strength",
+        "magnesium ions",
+        "mmol/L"
+      ],
+      "organic_coagulant_aid": [],
+      "inorganic_co-coagulant": [],
+      "treatment_scale": [
+        "bench-scale",
+        "jar-test",
+        "jar-test condition",
+        "pilot plant",
+        "small-scale pilot plant",
+        "full-scale",
+        "DWTP sampling",
+        "one-hundredth-scale",
+        "laboratory experiment"
+      ],
+      "rapid_mix_g": [
+        "velocity gradient (G)",
+        "G ="
+      ],
+      "assay_details": [
+        "BGM cells",
+        "6-well plates",
+        "incubated at",
+        "5% CO2",
+        "agar overlay",
+        "neutral red",
+        "plaques counted",
+        "triplicate wells",
+        "detection limit",
+        "PFU/mL"
+      ],
+      "flocculation_mixing_speed": [
+        "mixing intensities",
+        "tapered",
+        "rpm"
+      ],
+      "number_of_samples": [
+        "n =",
+        "collected weekly",
+        "triplicate",
+        "wells"
+      ],
+      "alkalinity_initial": [
+        "alkalinity",
+        "as CaCO3",
+        "acid neutralizing capacity",
+        "titration alkalinity"
+      ],
+      "alkalinity_final": [
+        "post-treatment alkalinity",
+        "treated water alkalinity",
+        "finished water",
+        "after CS"
+      ],
+      "tss_initial": [
+        "total suspended solids",
+        "TSS",
+        "suspended solids",
+        "mg/L SS"
+      ],
+      "toc_initial": [
+        "initial TOC",
+        "high content of TOC",
+        "organic content"
+      ],
+      "toc_final": [
+        "TOC after treatment",
+        "treated water TOC",
+        "post CS TOC",
+        "finished water TOC"
+      ],
+      "toc_percent_removal": [
+        "TOC removal",
+        "organic carbon reduction",
+        "removal efficiency vs TOC",
+        "%"
+      ],
+      "turbidity_initial": [
+        "raw water turbidity",
+        "high turbidity",
+        "turbidity",
+        "NTU",
+        "measured"
+      ],
+      "turbidity_final": [
+        "filtrate turbidity",
+        "post CS turbidity",
+        "after RSF turbidity"
+      ],
+      "turbidity_percent_removal": [
+        "turbidity reduction",
+        "% removal",
+        "clarification efficiency",
+        "breakthrough point"
+      ],
+      "uv254_initial": [
+        "UV254",
+        "UVA254",
+        "absorbance at 254 nm",
+        "spectrophotometer"
+      ],
+      "uv254_final": [
+        "post-treatment UV254",
+        "after coagulation UV254",
+        "treated water UV254"
+      ],
+      "uv260_initial": [
+        "UV260",
+        "A260",
+        "absorbance at 260 nm",
+        "nucleic-acid absorbance"
+      ],
+      "uv260_final": [
+        "post-treatment UV260",
+        "after coagulation UV260",
+        "treated water UV260"
+      ]
+    }

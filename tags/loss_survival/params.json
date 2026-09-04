@@ -1,0 +1,50 @@
+{
+  "virus_desc": [
+    "str",
+    "name/description of the virus"
+  ],
+  "temp": [
+    "str",
+    "Temperature value of the row with its corresponding unit. Examples: '396 k', '20 C'"
+  ],
+  "rh": [
+    "int",
+    "relative humidity under which the experiment took place, unit in %. May be denoted as 'RH' or 'Humidity'."
+  ],
+  "env_other": [
+    "str",
+    "other variables that have not been mentioned. This can contain pH values, other environment descriptors, etc."
+  ],
+  "generation": [
+    "str",
+    "generation method used for creating droplet(s). Examples: 'spraying', 'collision', 'pipetting'"
+  ],
+  "airborne_stationary": [
+    "str",
+    "Whether droplet was aerosol or stationary."
+  ],
+  "size": [
+    "str",
+    "size of droplet along with its unit of measurement"
+  ],
+  "surface": [
+    "str",
+    "Surface at which stationary droplets were tested on. Examples: 'plastic', 'steel', 'polystyrene'"
+  ],
+  "collection": [
+    "str",
+    "collection methods for aerosols"
+  ],
+  "media_desc": [
+    "str",
+    "Description of the medium used in the experiment. May be denoted as 'sample' or 'medium'. Examples: 'PBS', 'FCS', 'saliva'"
+  ],
+  "salt_val": [
+    "str",
+    "concentration of salt content in the medium, if reported. Include unit along with measurement"
+  ],
+  "time": [
+    "str",
+    "The time value of the row, expressed as a numeric quantity followed by an optional unit. Accept numeric-only values and default to 'min' when the unit is omitted, unless the context explicitly indicates seconds ('s') or hours ('h')."
+  ]
+}

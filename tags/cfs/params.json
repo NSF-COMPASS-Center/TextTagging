@@ -1,0 +1,42 @@
+{
+  "virus": [
+    "str",
+    "Virus or viral surrogate studied. Includes human and animal viruses, bacteriophages, virus-like particles, and broader descriptors, with strain or serotype names when given"
+  ],
+  "ph_before_treatment": [
+    "float",
+    "pH measurement directly from source water sample or on site measurement"
+  ],
+  "ph_after_treatment": [
+    "float",
+    "Any pH adjustment done or that recorded after treatment"
+  ],
+  "coagulant": [
+    "str",
+    "Reported coagulant used in each study. Includes aluminum- and ferric-based salts (e.g., alum, ferric chloride/sulfate, polyaluminum chloride variants), proprietary formulations (e.g., PFC, PACl subtypes, Acquapol, Cat Floc, Primafloc), and less common coagulants (e.g., lime, chitosan, PEI). Entries reflect names exactly as given in the source"
+  ],
+  "source_water": [
+    "str",
+    "General category of the water matrix used in each study. Some examples include surface waters, raw or treated drinking water sources, wastewater (raw, secondary, filtered, or effluent), synthetic lab-prepared waters, spent filter backwash, and tap water "
+  ],
+  "coagulant_dose": [
+    "str",
+    "Reported numerical dose of primary coagulant prior to unit conversion. Store with unit of measurement"
+  ],
+  "temp": [
+    "float",
+    "reported temperature in degrees Celsius when available"
+  ],
+  "rapid_mix_time": [
+    "str",
+    "Duration of the rapid mixing phase, typically reported in seconds or minutes. Value and unit of measurement is stored"
+  ],
+  "rapid_mix_speed": [
+    "str",
+    "Reported rapid mixing speed, measured in revolutions per minute (rpm)"
+  ],
+  "spiked_concentration": [
+    "str",
+    "Reported virus load added to samples, recorded in original study units (e.g., PFU/mL, TCID₅₀/mL, genome copies/mL, VLPs/mL). Values range from ~10² to >10¹¹ depending on assay and virus. Where studies provided log values or unusual formats (e.g., LD₅₀, PFU per 1000 L), these were transcribed directly"
+  ]
+}

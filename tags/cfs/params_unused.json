@@ -1,0 +1,122 @@
+{
+  "coagulant_aid_dose": [
+    "str",
+    "Reported numerical dose of coagulant aid, typically in mg/L"
+  ],
+  "flocculation_time": [
+    "str",
+    "Duration of flocculation, typically recorded in minutes; may include multi-stage times if reported. Store value and unit of measurement"
+  ],
+  "sedimentation_time": [
+    "float",
+    "Reported settling duration following flocculation; measured in minutes"
+  ],
+  "virus_measurement_methods": [
+    "str",
+    "Technique used for virus quantification, recorded as reported. Method categories are qPCR, RT-qPCR, PCR, RT-PCR, real-time PCR, plaque assay, PFU, TCID₅₀ (including cell culture TCID₅₀/ml), enzyme-linked immunosorbent assay (ELISA, e.g., NV-AD III kit), mouse assay, and radioimmunoassay (RIA endpoint titration)"
+  ],
+  "clay_addition": [
+    "str",
+    "Type and concentration of clay added to synthetic waters (e.g., kaolin, bentonite, montmorillonite, clinoptilolite), reported in units such as mg/L, g/L, or ppm"
+  ],
+  "sand_addition": [
+    "str",
+    "Silica (SiO₂) additions, recorded as suspensions or concentrations in g/L or mg/L"
+  ],
+  "alkalinity_addition": [
+    "str",
+    "Added alkalinity sources (e.g., NaHCO₃ buffer, Ca(OH)₂, CaCO₃, sodium bicarbonate) with reported concentrations in mg/L, mM, or descriptive buffer volume"
+  ],
+  "salt_addition": [
+    "str",
+    "Added salts reported as ionic concentrations (e.g., Na⁺, Ca²⁺, Mg²⁺) or as CaCl₂ solutions across a range of molarities"
+  ],
+  "organic_coagulant_aid": [
+    "str",
+    "Type of organic polymeric aid used, recorded as reported (e.g., cationic, anionic, or nonionic polymers such as polyacrylamide, polyDADMAC, Cat Floc, Primafloc, Nalcolyte, Magnifloc)"
+  ],
+  "inorganic_co-coagulant": [
+    "str",
+    "Additional inorganic coagulants used alongside the primary coagulant (e.g., PASS-10, sodium aluminate), with reported doses when available"
+  ],
+  "treatment_scale": [
+    "str",
+    "Study implementation level: Bench = controlled lab trials (often jar tests); Pilot = reduced-scale systems replicating plant conditions; Full = operational treatment systems"
+  ],
+  "rapid_mix_g": [
+    "float",
+    "Intensity of rapid mixing, reported as velocity gradient (G-value) in s⁻¹"
+  ],
+  "assay_details": [
+    "str",
+    "Specific primers, kits, or methods used for virus detection, typically cited directly from prior studies or international standards (e.g., ISO10705-2). References and primer IDs are retained as reported."
+  ],
+  "flocculation_mixing_speed": [
+    "str",
+    "Reported flocculation speeds, in rpm or G, sometimes subdivided into stages with varying intensities"
+  ],
+  "number_of_samples": [
+    "float",
+    "Reports replication and statistical treatment of experiments. Entries describe whether assays were run in duplicate, triplicate, or more (sometimes 3–6 runs), and may include details on plating replicates, averaging methods, or error bar representation. Some studies note single runs with duplicates for confirmation, or describe associated statistical analyses (e.g., ANOVA, variance tests)."
+  ],
+  "alkalinity_initial": [
+    "float",
+    "Initial alkalinity, most often measured directly from water samples, though in some cases set in lab conditions"
+  ],
+  "alkalinity_final": [
+    "float",
+    "Final alkalinity, typically measured from treated water samples, with some values from lab-controlled conditions"
+  ],
+  "tss_initial": [
+    "float",
+    "Initial total suspended solids"
+  ],
+  "toc_initial": [
+    "float",
+    "Total organic carbon before treatment"
+  ],
+  "toc_final": [
+    "float",
+    "Total organic carbon after treatment"
+  ],
+  "toc_percent_removal": [
+    "float",
+    "Percent reduction in TOC reported in paper"
+  ],
+  "turbidity_initial": [
+    "str",
+    "Reported initial turbidity"
+  ],
+  "turbidity_final": [
+    "str",
+    "Reported final turbidity"
+  ],
+  "turbidity_percent_removal": [
+    "float",
+    "Percent turbidity removal, as reported"
+  ],
+  "uv254_initial": [
+    "float",
+    "UV absorbance at 254 nm before treatment"
+  ],
+  "uv254_final": [
+    "float",
+    "UV absorbance at 254 nm after treatment"
+  ],
+  "uv260_initial": [
+    "float",
+    "UV absorbance at 260 nm before treatment"
+  ],
+  "uv260_final": [
+    "float",
+    "UV absorbance at 260 nm after treatment"
+  ],
+  "virus_concentration": [
+    "float",
+    "Measured virus concentration after treatment, as reported in the study"
+  ],
+  "sampling_date": [
+    "str",
+    "Date of sampling"
+  ]
+}
