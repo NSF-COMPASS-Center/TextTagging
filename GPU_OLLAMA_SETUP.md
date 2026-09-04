@@ -56,3 +56,12 @@ extra flags.
 - [ ] `source venv/bin/activate`
 - [ ] `python test_llm_tagger.py --provider ollama --model gpt-oss:20b --paper-type cfs`
 - [ ] Check `output/test_llm_tagger.json` (or wherever `--output` points) for the tagged chunks + reasoning
+
+### Running the `experiments/*/llm/` configs
+
+- [ ] `python run_batch.py --config experiments/<paper_type>/<method>/llm/sent<N>.yaml --input papers/<paper_type>/.../*.md`
+- [ ] Do **not** pass `--ground-truth` — the eval report only runs when that flag is
+      given, so leaving it off skips the ground-truth accuracy step entirely and
+      keeps the GPU run to tagging + extraction + the per-paper
+      `<pdf_name>_comparison.csv`/`.html` side-by-side, which lands in each paper's
+      `output_dir` regardless of ground truth.
